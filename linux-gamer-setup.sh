@@ -59,7 +59,6 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 confirm_install "Steam" && flatpak install --assumeyes flathub com.valvesoftware.Steam
 confirm_install "Lutris" && flatpak install --assumeyes flathub net.lutris.Lutris
 confirm_install "Heroic Game Launcher" && flatpak install --assumeyes flathub com.heroicgameslauncher.hgl
-confirm_install "Bottles" && flatpak install --assumeyes flathub com.usebottles.bottles
 
 # Ferramentas Wine e Proton
 confirm_install "Wine" && flatpak install --assumeyes flathub org.winehq.Wine
