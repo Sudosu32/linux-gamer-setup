@@ -1,131 +1,101 @@
 #!/bin/bash
 
-# Função para verificar e instalar pacotes
-install_package() {
-    if ! command -v "$1" &> /dev/null; then
-        echo "$1 não encontrado! Instalando..."
-        if command -v apt &> /dev/null; then
-            apt install -y "$1"
-        elif command -v dnf &> /dev/null; then
-            dnf install -y "$1"
-        elif command -v pacman &> /dev/null; then
-            pacman -S --noconfirm "$1"
-        elif command -v zypper &> /dev/null; then
-            zypper install -y "$1"
-        else
-            echo "Gerenciador de pacotes não suportado. Instale $1 manualmente."
-            exit 1
-        fi
+# Função para verificar se o Flatpak está instalado
+check_flatpak() {
+  if ! command -v flatpak &> /dev/null
+  then
+    echo "Flatpak não encontrado! Instalando..."
+    # Instalar Flatpak
+    if [ -f /etc/debian_version ]; then
+        sudo apt update && sudo apt install flatpak -y
+    elif [ -f /etc/fedora-release ]; then
+        sudo dnf install flatpak -y
+    elif [ -f /etc/arch-release ]; then
+        sudo pacman -S flatpak
     fi
+  fi
 }
 
-# Verifica se o usuário é root
-if [ "$EUID" -ne 0 ]; then
-    echo "Este script precisa ser executado como root. Use: sudo ./linux-gamer-setup.sh"
-    exit 1
-fi
-
-# Instala Flatpak e Vulkan
-install_package "flatpak"
-install_package "vulkan-utils"
-
-# Função para perguntar ao usuário antes de instalar
-confirm_install() {
-    read -p "Deseja instalar $1? (s/n): " choice
-    case "$choice" in
-        s|S ) return 0 ;;
-        * ) return 1 ;;
-    esac
+# Função para adicionar o repositório Flathub
+add_flathub_repo() {
+  echo "Adicionando o repositório Flathub..."
+  sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 }
 
-echo "Atualizando o sistema..."
-flatpak update --assumeyes
+# Função para instalar o pacote via Flatpak
+install_flatpak() {
+  package=$1
+  echo "Deseja instalar $package? (s/n): "
+  read -r install
+  if [[ "$install" =~ ^[Ss]$ ]]; then
+    sudo flatpak install flathub "$package" -y
+  fi
+}
 
-echo "Adicionando o repositório Flathub..."
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
-# Instalação das lojas de jogos
-confirm_install "Steam" && flatpak install --assumeyes flathub com.valvesoftware.Steam
-confirm_install "Lutris" && flatpak install --assumeyes flathub net.lutris.Lutris
-confirm_install "Heroic Game Launcher" && flatpak install --assumeyes flathub com.heroicgameslauncher.hgl
-
-# Ferramentas Wine e Proton
-confirm_install "Wine" && flatpak install --assumeyes flathub org.winehq.Wine
-confirm_install "WineZGUI" && flatpak install --assumeyes flathub io.github.fastrizwaan.WineZGUI
-confirm_install "ProtonUp-Qt" && flatpak install --assumeyes flathub net.davidotek.pupgui2
-confirm_install "Protontricks" && flatpak install --assumeyes flathub com.github.Matoking.protontricks
-
-# Ferramentas de otimização
-confirm_install "MangoHud (overlay de desempenho)" && flatpak install --assumeyes flathub org.freedesktop.Platform.VulkanLayer.MangoHud
-confirm_install "GPU-Viewer" && flatpak install --assumeyes flathub com.valvesoftware.Steam.CompatibilityTool.GPUViewer
-
-# Instalação de emuladores
-confirm_install "RPCS3 (PS3)" && flatpak install --assumeyes flathub net.rpcs3.RPCS3
-confirm_install "mGBA (GBA)" && flatpak install --assumeyes flathub io.mgba.mGBA
-confirm_install "PPSSPP (PSP)" && flatpak install --assumeyes flathub org.ppsspp.PPSSPP
-confirm_install "PCSX2 (PS2)" && flatpak install --assumeyes flathub net.pcsx2.PCSX2
-confirm_install "DuckStation (PS1)" && flatpak install --assumeyes flathub org.duckstation.DuckStation
-
-# Outras ferramentas
-confirm_install "GeForce NOW Electron" && flatpak install --assumeyes flathub io.github.hmlendea.geforcenow-electron
-confirm_install "AntiMicroX (Mapeador de controle)" && flatpak install --assumeyes flathub io.github.antimicrox.antimicrox
-
-# Instalação do GameMode
-if confirm_install "GameMode (otimização automática de jogos)"; then
-    install_package "gamemode"
-fi
-
-# Configuração do MangoHud
-echo "Configurando MangoHud..."
-mkdir -p ~/.config/MangoHud
-cat > ~/.config/MangoHud/MangoHud.conf <<EOL
-fps_limit=0
-vsync=0
-gpu_stats=1
-cpu_stats=1
-ram=1
-frametime=1
-temperature=1
-gpu_temp=1
-cpu_temp=1
-time=1
-position=top-right
-EOL
-
-# Limpeza de cache após instalação
-echo "Limpando cache de pacotes..."
-flatpak repair --assumeyes
-
-# Otimizações de hardware
-echo "Escolha sua GPU:"
-echo "1 - AMD"
-echo "2 - NVIDIA"
-read -p "Digite o número correspondente: " gpu_choice
-
-if [ "$gpu_choice" == "1" ]; then
+# Função para configurar a GPU
+configure_gpu() {
+  echo "Escolha sua GPU:"
+  echo "1 - AMD"
+  echo "2 - NVIDIA"
+  read -p "Digite o número correspondente: " gpu_choice
+  if [ "$gpu_choice" == "1" ]; then
     echo "Configurando otimizações para AMD..."
-    echo "export DXVK_FILTER_DEVICE_NAME=AMD" >> ~/.profile
-    echo "export RADV_PERFTEST=aco" >> ~/.profile
-    echo "export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/radeon_icd.x86_64.json" >> ~/.profile
-elif [ "$gpu_choice" == "2" ]; then
+    echo "Comandos para otimizar jogos na Steam:"
+    echo "Para ativar MangoHud em um jogo, adicione no 'Opções de Inicialização' da Steam:"
+    echo "MANGOHUD=1 gamemoderun %command%"
+    echo "Comando para ativar o Vulkan Async (apenas AMD):"
+    echo "RADV_PERFTEST=aco %command%"
+  elif [ "$gpu_choice" == "2" ]; then
     echo "Configurando otimizações para NVIDIA..."
-    echo "export DXVK_FILTER_DEVICE_NAME=NVIDIA" >> ~/.profile
-    echo "export __GL_THREADED_OPTIMIZATIONS=1" >> ~/.profile
-    echo "export __GL_SHADER_DISK_CACHE=1" >> ~/.profile
-    echo "export __GL_SHADER_DISK_CACHE_PATH=$HOME/.nv/ShaderCache" >> ~/.profile
-else
-    echo "Opção inválida. Nenhuma otimização de GPU aplicada."
-fi
+    echo "Comando para otimizar DXVK para NVIDIA:"
+    echo "DXVK_ASYNC=1 __GL_SHADER_DISK_CACHE=1 %command%"
+  fi
+}
 
-# Comandos úteis para Steam
-echo "Comandos para otimizar jogos na Steam:"
-echo 'Para ativar MangoHud em um jogo, adicione no "Opções de Inicialização" da Steam:'
-echo '  MANGOHUD=1 gamemoderun %command%'
-echo ""
-echo "Comando para ativar o Vulkan Async (apenas AMD):"
-echo '  RADV_PERFTEST=aco %command%'
-echo ""
-echo "Comando para otimizar DXVK para NVIDIA:"
-echo '  DXVK_ASYNC=1 __GL_SHADER_DISK_CACHE=1 %command%'
+# Função principal do script
+main() {
+  echo "Atualizando e carregando repositórios..."
+  sudo flatpak update -y
 
-echo "Configuração finalizada! Reinicie o sistema para aplicar todas as otimizações."
+  # Verifica e instala o Flatpak
+  check_flatpak
+
+  # Adiciona o repositório Flathub
+  add_flathub_repo
+
+  # Instala os jogos e ferramentas necessários
+  install_flatpak com.valvesoftware.Steam
+  install_flatpak net.lutris.Lutris
+  install_flatpak com.heroicgameslauncher.hgl
+  install_flatpak com.github.Matoking.protontricks
+  install_flatpak org.freedesktop.Platform.VulkanLayer.MangoHud
+  install_flatpak net.rpcs3.RPCS3
+  install_flatpak io.mgba.mGBA
+  install_flatpak org.ppsspp.PPSSPP
+  install_flatpak net.pcsx2.PCSX2
+  install_flatpak org.duckstation.DuckStation
+  install_flatpak io.github.hmlendea.geforcenow-electron
+  install_flatpak io.github.antimicrox.antimicrox
+
+  # Instalar o GameMode
+  echo "Instalando o GameMode..."
+  if [ -f /etc/debian_version ]; then
+    sudo apt install gamemode -y
+  elif [ -f /etc/fedora-release ]; then
+    sudo dnf install gamemode -y
+  elif [ -f /etc/arch-release ]; then
+    sudo pacman -S gamemode
+  fi
+
+  # Configura o MangoHud
+  echo "Configurando MangoHud..."
+  sudo flatpak install flathub org.freedesktop.Platform.VulkanLayer.MangoHud -y
+
+  # Pergunta sobre a configuração da GPU
+  configure_gpu
+
+  echo "Configuração finalizada! Reinicie o sistema para aplicar todas as otimizações."
+}
+
+# Chama a função principal
+main
