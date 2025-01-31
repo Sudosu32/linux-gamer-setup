@@ -1,44 +1,33 @@
 #!/bin/bash
 
+# Função para verificar e instalar pacotes
+install_package() {
+    if ! command -v "$1" &> /dev/null; then
+        echo "$1 não encontrado! Instalando..."
+        if command -v apt &> /dev/null; then
+            apt install -y "$1"
+        elif command -v dnf &> /dev/null; then
+            dnf install -y "$1"
+        elif command -v pacman &> /dev/null; then
+            pacman -S --noconfirm "$1"
+        elif command -v zypper &> /dev/null; then
+            zypper install -y "$1"
+        else
+            echo "Gerenciador de pacotes não suportado. Instale $1 manualmente."
+            exit 1
+        fi
+    fi
+}
+
 # Verifica se o usuário é root
 if [ "$EUID" -ne 0 ]; then
     echo "Este script precisa ser executado como root. Use: sudo ./linux-gamer-setup.sh"
     exit 1
 fi
 
-# Verifica se o Flatpak está instalado
-if ! command -v flatpak &> /dev/null; then
-    echo "Flatpak não encontrado! Instalando..."
-    if command -v apt &> /dev/null; then
-        apt install -y flatpak
-    elif command -v dnf &> /dev/null; then
-        dnf install -y flatpak
-    elif command -v pacman &> /dev/null; then
-        pacman -S --noconfirm flatpak
-    elif command -v zypper &> /dev/null; then
-        zypper install -y flatpak
-    else
-        echo "Gerenciador de pacotes não suportado. Instale o Flatpak manualmente."
-        exit 1
-    fi
-fi
-
-# Verifica se o Vulkan está instalado
-if ! command -v vulkaninfo &> /dev/null; then
-    echo "Vulkan não encontrado! Instalando..."
-    if command -v apt &> /dev/null; then
-        apt install -y vulkan-utils
-    elif command -v dnf &> /dev/null; then
-        dnf install -y vulkan-tools
-    elif command -v pacman &> /dev/null; then
-        pacman -S --noconfirm vulkan-tools
-    elif command -v zypper &> /dev/null; then
-        zypper install -y vulkan-tools
-    else
-        echo "Gerenciador de pacotes não suportado. Instale o Vulkan manualmente."
-        exit 1
-    fi
-fi
+# Instala Flatpak e Vulkan
+install_package "flatpak"
+install_package "vulkan-utils"
 
 # Função para perguntar ao usuário antes de instalar
 confirm_install() {
@@ -83,21 +72,7 @@ confirm_install "AntiMicroX (Mapeador de controle)" && flatpak install --assumey
 
 # Instalação do GameMode
 if confirm_install "GameMode (otimização automática de jogos)"; then
-    if command -v gamemoded &> /dev/null; then
-        echo "GameMode já está instalado."
-    else
-        if command -v apt &> /dev/null; then
-            apt install -y gamemode
-        elif command -v dnf &> /dev/null; then
-            dnf install -y gamemode
-        elif command -v pacman &> /dev/null; then
-            pacman -S --noconfirm gamemode
-        elif command -v zypper &> /dev/null; then
-            zypper install -y gamemode
-        else
-            echo "Gerenciador de pacotes não suportado. Instale o GameMode manualmente."
-        fi
-    fi
+    install_package "gamemode"
 fi
 
 # Configuração do MangoHud
