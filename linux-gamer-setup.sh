@@ -6,6 +6,40 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Verifica se o Flatpak está instalado
+if ! command -v flatpak &> /dev/null; then
+    echo "Flatpak não encontrado! Instalando..."
+    if command -v apt &> /dev/null; then
+        apt install -y flatpak
+    elif command -v dnf &> /dev/null; then
+        dnf install -y flatpak
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm flatpak
+    elif command -v zypper &> /dev/null; then
+        zypper install -y flatpak
+    else
+        echo "Gerenciador de pacotes não suportado. Instale o Flatpak manualmente."
+        exit 1
+    fi
+fi
+
+# Verifica se o Vulkan está instalado
+if ! command -v vulkaninfo &> /dev/null; then
+    echo "Vulkan não encontrado! Instalando..."
+    if command -v apt &> /dev/null; then
+        apt install -y vulkan-utils
+    elif command -v dnf &> /dev/null; then
+        dnf install -y vulkan-tools
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm vulkan-tools
+    elif command -v zypper &> /dev/null; then
+        zypper install -y vulkan-tools
+    else
+        echo "Gerenciador de pacotes não suportado. Instale o Vulkan manualmente."
+        exit 1
+    fi
+fi
+
 # Função para perguntar ao usuário antes de instalar
 confirm_install() {
     read -p "Deseja instalar $1? (s/n): " choice
@@ -84,6 +118,10 @@ cpu_temp=1
 time=1
 position=top-right
 EOL
+
+# Limpeza de cache após instalação
+echo "Limpando cache de pacotes..."
+flatpak repair --assumeyes
 
 # Otimizações de hardware
 echo "Escolha sua GPU:"
