@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Script criado por NeotrixSU, procure o canal no youtube!
 # Verifica se o usuário é root
 if [ "$EUID" -ne 0 ]; then
     echo "Este script precisa ser executado como root. Use: sudo ./linux-gamer-setup.sh"
@@ -30,10 +29,10 @@ confirm_install "Bottles" && flatpak install --assumeyes flathub com.usebottles.
 
 # Ferramentas Wine e Proton
 confirm_install "Wine" && flatpak install --assumeyes flathub org.winehq.Wine
-confirm_install "WineZGUI" && flatpak install --assumeyes flathub com.github.diddlesnaps.winezgui
+confirm_install "WineZGUI" && flatpak install --assumeyes flathub io.github.fastrizwaan.WineZGUI
 confirm_install "ProtonUp-Qt" && flatpak install --assumeyes flathub net.davidotek.pupgui2
 confirm_install "ProtonPlus" && flatpak install --assumeyes flathub com.github.Matoking.ProtonPlus
-confirm_install "Protontricks" && flatpak install --assumeyes flathub com.github.FlorianBruhin.Protontricks
+confirm_install "Protontricks" && flatpak install --assumeyes flathub com.github.Matoking.protontricks
 
 # Ferramentas de otimização
 confirm_install "CoreCtrl (controle da ventoinha da GPU)" && flatpak install --assumeyes flathub org.corectrl.CoreCtrl
