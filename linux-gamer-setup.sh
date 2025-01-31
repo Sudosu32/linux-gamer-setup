@@ -25,18 +25,56 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 confirm_install "Steam" && flatpak install -y flathub com.valvesoftware.Steam
 confirm_install "Lutris" && flatpak install -y flathub net.lutris.Lutris
 confirm_install "Heroic Game Launcher" && flatpak install -y flathub com.heroicgameslauncher.hgl
-confirm_install "Boros" && flatpak install -y flathub io.github.borossh.Boros
+confirm_install "Bottles" && flatpak install -y flathub io.github.usebottles.bottles
 
 # Instalação de ferramentas Wine
 confirm_install "Wine" && flatpak install -y flathub org.winehq.Wine
-confirm_install "PlayOnLinux" && flatpak install -y flathub org.phoenicis.playonlinux
 
 # Instalação de ferramentas de otimização
 confirm_install "CoreCtrl (controle da ventoinha da GPU)" && flatpak install -y flathub org.corectrl.CoreCtrl
 confirm_install "MangoHud (overlay de desempenho)" && flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud
-confirm_install "VkBasalt (filtro de pós-processamento para Vulkan)" && flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.VkBasalt
-confirm_install "GOverlay (configuração do MangoHud e VkBasalt)" && flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.GOverlay
-confirm_install "obs-vkcapture (captura Vulkan para OBS Studio)" && flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.obs-vkcapture
+
+# Instalação de VkBasalt, GOverlay, e obs-vkcapture (com alternativas para instalação)
+confirm_install "VkBasalt (filtro de pós-processamento para Vulkan)" && {
+    echo "Instalando VkBasalt..."
+    if command -v apt &> /dev/null; then
+        apt install -y vkbasalt
+    elif command -v dnf &> /dev/null; then
+        dnf install -y vkbasalt
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm vkbasalt
+    elif command -v zypper &> /dev/null; then
+        zypper install -y vkbasalt
+    else
+        echo "Gerenciador de pacotes não suportado. Instale o VkBasalt manualmente."
+    fi
+}
+
+confirm_install "GOverlay (configuração do MangoHud e VkBasalt)" && {
+    echo "Instalando GOverlay..."
+    if command -v apt &> /dev/null; then
+        apt install -y goverlay
+    elif command -v dnf &> /dev/null; then
+        dnf install -y goverlay
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm goverlay
+    else
+        echo "Gerenciador de pacotes não suportado. Instale o GOverlay manualmente."
+    fi
+}
+
+confirm_install "obs-vkcapture (captura Vulkan para OBS Studio)" && {
+    echo "Instalando obs-vkcapture..."
+    if command -v apt &> /dev/null; then
+        apt install -y obs-vkcapture
+    elif command -v dnf &> /dev/null; then
+        dnf install -y obs-vkcapture
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm obs-vkcapture
+    else
+        echo "Gerenciador de pacotes não suportado. Instale o obs-vkcapture manualmente."
+    fi
+}
 
 # Instalação de ferramentas de criação de conteúdo
 confirm_install "Kdenlive" && flatpak install -y flathub org.kde.kdenlive
