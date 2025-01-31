@@ -67,7 +67,6 @@ confirm_install "ProtonUp-Qt" && flatpak install --assumeyes flathub net.davidot
 confirm_install "Protontricks" && flatpak install --assumeyes flathub com.github.Matoking.protontricks
 
 # Ferramentas de otimização
-confirm_install "CoreCtrl (controle da ventoinha da GPU)" && flatpak install --assumeyes flathub org.corectrl.CoreCtrl
 confirm_install "MangoHud (overlay de desempenho)" && flatpak install --assumeyes flathub org.freedesktop.Platform.VulkanLayer.MangoHud
 confirm_install "GPU-Viewer" && flatpak install --assumeyes flathub com.valvesoftware.Steam.CompatibilityTool.GPUViewer
 
