@@ -87,9 +87,6 @@ main() {
     sudo pacman -S gamemode
   fi
 
-  # Configura o MangoHud
-  echo "Configurando MangoHud..."
-  sudo flatpak install flathub org.freedesktop.Platform.VulkanLayer.MangoHud -y
 
   # Pergunta sobre a configuração da GPU
   configure_gpu
