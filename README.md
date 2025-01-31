@@ -1,3 +1,5 @@
+
+
 # Linux Gamer Setup
 
 Este repositório contém um script para transformar qualquer distribuição Linux em uma máquina gamer utilizando apenas pacotes Flatpak.
@@ -10,22 +12,21 @@ Este repositório contém um script para transformar qualquer distribuição Lin
 
 ## Ferramentas instaladas:
 
-- Steam
-- Lutris
-- Heroic Game Launcher
-- Wine
-- WineZGUI
-- ProtonUp-Qt
-- Protontricks
-- MangoHud
-- GPU-Viewer
-- RPCS3
-- mGBA
-- PPSSPP
-- PCSX2
-- DuckStation
-- GeForce NOW Electron
-- AntiMicroX
+- **Steam**: Plataforma de distribuição digital para jogos, permite jogar títulos nativos para Linux e usar o Proton para rodar jogos Windows no Linux.
+- **Lutris**: Plataforma de gerenciamento de jogos para Linux que suporta nativos, emuladores e jogos via Wine, Proton e outros.
+- **Heroic Game Launcher**: Cliente de código aberto para Epic Games Store e GOG, permitindo rodar jogos desses serviços no Linux.
+- **Wine**: Implementação de uma camada de compatibilidade que permite rodar aplicativos Windows no Linux.
+- **WineZGUI**: Interface gráfica para o Wine, facilitando a configuração e instalação de jogos e programas Windows no Linux.
+- **ProtonUp-Qt**: Ferramenta para gerenciar e instalar versões do Proton, que permite rodar jogos Windows via Steam no Linux.
+- **Protontricks**: Ferramenta para configurar o Proton e Wine de forma mais avançada, permitindo ajustes em jogos individuais.
+- **MangoHud**: Ferramenta de monitoramento de desempenho em jogos, exibindo informações como FPS, uso de CPU, GPU e RAM.
+- **RPCS3**: Emulador de PlayStation 3 para Linux, permitindo rodar jogos de PS3 no seu PC.
+- **mGBA**: Emulador de Game Boy Advance, permitindo jogar títulos dessa plataforma no Linux.
+- **PPSSPP**: Emulador de PlayStation Portable (PSP), permitindo jogar títulos de PSP no Linux.
+- **PCSX2**: Emulador de PlayStation 2, permitindo rodar jogos dessa plataforma no Linux.
+- **DuckStation**: Emulador de PlayStation, focado na emulação de alta performance e compatibilidade com jogos PS1.
+- **GeForce NOW Electron**: Cliente de streaming de jogos da NVIDIA, permitindo rodar jogos na nuvem utilizando a infraestrutura da NVIDIA.
+- **AntiMicroX**: Ferramenta para mapear teclados e controles para qualquer tecla ou ação no Linux, útil para configurar joysticks e gamepads.
 
 ---
 
